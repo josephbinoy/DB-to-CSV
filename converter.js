@@ -5,9 +5,9 @@ import fs from 'fs/promises';
 import { parse } from 'json2csv';
 
 const baseUrl = 'https://osu.ppy.sh/api/v2/beatmapsets/';
-const dbFilePath = 'overplayed.db'; 
-const client_id = '33014'
-const client_secret = 'l09N1jqv1Z7CfLSSReOYCbNFVpI0Wl1P4FvqtiTo'
+const dbFilePath = ''; 
+const client_id = ''
+const client_secret = ''
 let bearerToken = '';
 
 async function getGuestToken() {
