@@ -8,7 +8,7 @@
 
    ```bash
    git clone https://github.com/josephbinoy/DB-to-CSV
-   cd your-repo
+   cd DB-to-CSV
    ```
 2. Install dependencies
    ```
@@ -20,7 +20,7 @@
    const client_id
    const client_secret
    ```
-4. Paste .db inside DB-to-CSV folder
+4. Paste .db file inside DB-to-CSV folder
 5. Run the script
    ```
    node converter.js
