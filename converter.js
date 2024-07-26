@@ -114,7 +114,7 @@ async function processDatabase() {
         const {artist, title} = await fetchBeatmapAndArtistName(row.BEATMAP_ID);
         results.push({
             beatmapset_id: row.BEATMAP_ID,
-            beatmap_name: title,
+            beatmapset_name: title,
             artist: artist,
             pick_count: row.PICK_COUNT,
         });
