@@ -81,7 +81,6 @@ async function fetchBeatmapAndArtistName(beatmapId) {
     }
 }
 
-// Function to process the database query and write results
 async function processDatabase() {
     process.stdout.write('Requesting guest token...');
     bearerToken = await getGuestToken();
@@ -125,7 +124,6 @@ async function processDatabase() {
     }
     console.log('\n');
     console.log('Writing results to CSV...');
-    // Convert results to CSV and write to file
     const csv = parse(results);
     await fs.writeFile('overplayed_maps_list.csv', csv);
     console.log('Done!');
