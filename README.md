@@ -14,13 +14,13 @@
    ```
     npm i
    ```
-3. Add your credentials inside converter.js
+3. Paste .db file inside DB-to-CSV folder
+4. Replace '' with your credentials and db path(just the name of db if you pasted it inside the folder) inside converter.js
    ```
-   const dbFilePath
-   const client_id
-   const client_secret
+   const dbFilePath = ''
+   const client_id = ''
+   const client_secret = ''
    ```
-4. Paste .db file inside DB-to-CSV folder
 5. Run the script
    ```
    node converter.js
