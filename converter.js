@@ -4,7 +4,7 @@ import axios from 'axios';
 import fs from 'fs/promises';
 import { parse } from 'json2csv';
 
-const baseUrl = 'https://osu.ppy.sh/api/v2/beatmapsets/';
+const baseUrl = 'https://osu.ppy.sh/api/v2/';
 const dbFilePath = 'your-db-name.db'; 
 const client_id = 'your-client-id-here'
 const client_secret = 'your-client-secret-here'
