@@ -44,7 +44,7 @@ function updateProgressBar(current, total) {
 
 async function fetchBeatmapAndArtistName(beatmapId) {
   try {
-    const url = baseUrl + beatmapId;
+    const url = baseUrl + 'beatmapsets/' + beatmapId;
 
     const response = await axios.get(url, {
       headers: {
@@ -52,7 +52,6 @@ async function fetchBeatmapAndArtistName(beatmapId) {
       },
     });
 
-    const mapset = response.data;
     if (response.status == 200) {
         if (response.data) {
             return {
@@ -81,17 +80,51 @@ async function fetchBeatmapAndArtistName(beatmapId) {
     }
 }
 
+async function fetchPlayerName(playerIds) {
+    let result=[];
+    try {
+        const url = baseUrl + 'users?' + playerIds.map(id => `ids[]=${id}`).join('&');
+    
+        const response = await axios.get(url, {
+          headers: {
+            'Authorization': `Bearer ${bearerToken}`,
+          },
+        });
+    
+        const players = response.data;
+        if (response.status == 200) {
+            if (players.users) {
+                result = players.users.map(player => {
+                    return {
+                        name: player.username,
+                        id: player.id,
+                    };
+                });
+            }
+        } else {
+            console.error(`Error: Received status code ${response.status}`);
+            return {
+                artist: 'Error',
+                title: 'Error',
+            };
+        }
+    } catch (error) {
+        console.error(`Error: ${error.message}`);
+    }
+    return result;
+}
+
 async function processDatabase() {
     process.stdout.write('Requesting guest token...');
     bearerToken = await getGuestToken();
     process.stdout.write('\rRequesting guest token... Success!          \n');
     let rows = [];
     const query1 = `
-    SELECT BEATMAP_ID, COUNT(*) as PICK_COUNT
-    FROM PICKS
-    GROUP BY BEATMAP_ID
-    ORDER BY PICK_COUNT DESC;
-    `;
+        SELECT BEATMAP_ID, COUNT(*) as PICK_COUNT
+        FROM PICKS
+        GROUP BY BEATMAP_ID
+        ORDER BY PICK_COUNT DESC;
+        `;
     const db = await open({
         filename: dbFilePath,
         driver: sqlite3.Database,
@@ -118,6 +151,7 @@ async function processDatabase() {
         });
         updateProgressBar(i + 1, totalRows);
 
+        // Rate limiting: wait 1 second between requests
         await new Promise(resolve => setTimeout(resolve, 1000));
     }
     console.log('\n');
@@ -127,14 +161,30 @@ async function processDatabase() {
     const query2 = `SELECT COUNT(DISTINCT PICKER_ID) as plcount FROM PICKS;`;
     const query3 = `SELECT COUNT(DISTINCT BEATMAP_ID) as bcount FROM PICKS;`;
     const query4 = `SELECT COUNT(*) as pcount FROM PICKS;`;
-    console.log(`Printing stats...`);
+    const query5 = `
+        SELECT PICKER_ID, COUNT(*) AS pick_count
+        FROM PICKS
+        GROUP BY PICKER_ID
+        ORDER BY pick_count DESC
+        LIMIT 5;
+        `;
+    console.log('Fetching player information from bancho...');
     try {
         const playerCount = await db.get(query2);
         const beatmapCount = await db.get(query3);
         const picksCount = await db.get(query4);
+        const topPickers = await db.all(query5);
+        const pickerInfo = await fetchPlayerName(topPickers.map(picker => picker.PICKER_ID));
+        console.log(`Printing stats...`);
         console.log(`Total picks: ${picksCount.pcount}`);
         console.log(`Unique players count: ${playerCount.plcount}`);
         console.log(`Unique beatmaps count: ${beatmapCount.bcount}`);
+        if (pickerInfo){
+            console.log('Top pickers (5 max):');
+            for (let i = 0; i < pickerInfo.length; i++){
+                console.log(`${i+1}. ${pickerInfo[i].name} (${pickerInfo[i].id}) with ${topPickers[i].pick_count} picks`);
+            }
+        }
     }
     catch (error) {
         console.error(`Error: ${error.message}`);
