@@ -185,9 +185,10 @@ async function printStats(db) {
 }
 
 async function readCsvAndGenerateMap(){
+    if (!oldCsvPath) return null;
     const map = new Map();
     try {
-        console.log('Parsing old.csv...');
+        console.log('Parsing old csv...');
         const oldCsv = await fs.readFile(oldCsvPath, 'utf8');        
         const parser = parse(oldCsv, { columns: true });
     
@@ -286,7 +287,7 @@ async function main() {
     const results = [];
     const beatmapMap = await readCsvAndGenerateMap();
     if (!beatmapMap) {
-        console.log('old.csv couldnt be parsed. Searching only from bancho now. ');
+        console.log('Old csv couldnt be parsed. Searching only from bancho now. ');
     }
     console.log('Gathering beatmap information...\n');
     for (let i = 0; i < totalRows; i++) {
