@@ -196,8 +196,8 @@ async function readCsvAndGenerateMap(){
             parser.on('readable', function(){
                 let record;
                 while (record = parser.read()) {
-                    const { beatmapset_id, beatmap_name, artist } = record;
-                    map.set(Number(beatmapset_id), { artist, beatmap_name });
+                    const { beatmapset_id, beatmapset_name, artist } = record;
+                    map.set(Number(beatmapset_id), { artist, beatmapset_name });
                 }
             });
     
@@ -292,20 +292,20 @@ async function main() {
     console.log('Gathering beatmap information...\n');
     for (let i = 0; i < totalRows; i++) {
         const row = rows[i];
-        let artist = '';
-        let title = '';
+        let creator = '';
+        let name = '';
         const beatmapId = Number(row.BEATMAP_ID); 
         if (beatmapMap && beatmapMap.has(beatmapId)) {
-            ({ artist, beatmap_name: title } = beatmapMap.get(beatmapId));
+            ({ artist: creator, beatmapset_name: name } = beatmapMap.get(beatmapId));
         } else {
-            ({ artist, title } = await fetchBeatmapAndArtistName(beatmapId));
+            ({ artist: creator, title: name } = await fetchBeatmapAndArtistName(beatmapId));
             // Rate limiting: wait 1 second between requests
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
         results.push({
             beatmapset_id: row.BEATMAP_ID,
-            beatmapset_name: title,
-            artist: artist,
+            beatmapset_name: name,
+            artist: creator,
             pick_count: row.PICK_COUNT,
         });
         updateProgressBar(i + 1, totalRows);
