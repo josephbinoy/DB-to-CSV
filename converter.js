@@ -299,8 +299,7 @@ async function main() {
             ({ artist: creator, beatmapset_name: name } = beatmapMap.get(beatmapId));
         } else {
             ({ artist: creator, title: name } = await fetchBeatmapAndArtistName(beatmapId));
-            // Rate limiting: wait 1 second between requests
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 70));
         }
         results.push({
             beatmapset_id: row.BEATMAP_ID,
